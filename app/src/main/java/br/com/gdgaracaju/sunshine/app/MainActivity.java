@@ -10,6 +10,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class MainActivity extends Activity {
@@ -53,6 +59,8 @@ public class MainActivity extends Activity {
      */
     public static class PlaceholderFragment extends Fragment {
 
+        private ArrayAdapter<String> mForecastAdapter;
+
         public PlaceholderFragment() {
         }
 
@@ -60,6 +68,35 @@ public class MainActivity extends Activity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            //fake data
+            String[] forecastArray ={
+                "Today - Sunny - 88/63",
+                "Tomorrow - Sunny - 88/63",
+                "Tuesday - Sunny - 88/63",
+                "Wednesday - Sunny - 88/63",
+                "Thursday - Sunny - 88/63",
+                "Friday - Sunny - 88/63",
+                "Sunday - Sunny - 88/63"
+            };
+
+            List<String> weekForecast = new ArrayList<String>(
+                    Arrays.asList(forecastArray));
+
+            this.mForecastAdapter = new ArrayAdapter<String>(
+                    //context
+                    getActivity(),
+                    //id of list item layout
+                    R.layout.list_item_forecast,
+                    //id of textview to populate
+                    R.id.list_item_forecast_textview,
+                    //data
+                    weekForecast);
+
+            ListView listView = (ListView) rootView.findViewById(
+                    R.id.listview_forecast);
+            listView.setAdapter(mForecastAdapter);
+
             return rootView;
         }
     }
