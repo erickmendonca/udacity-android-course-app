@@ -1,6 +1,7 @@
 package br.com.gdgaracaju.sunshine.app;
 
 import android.app.Fragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,7 +48,14 @@ public class ForecastFragment extends Fragment {
         };
 
         //getting live data
-        String forecastJson = getForecastJson();
+        try {
+            URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
+            new FetchWeatherTask().execute(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        String forecastJson = null;
         Log.i("forecastJson", forecastJson);
 
         List<String> weekForecast = new ArrayList<String>(
@@ -70,70 +78,68 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
-    public String getForecastJson(){
-        // These two need to be declared outside the try/catch
-        // so that they can be closed in the finally block.
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
+    private class FetchWeatherTask extends AsyncTask<URL, Void, String> {
+        protected String doInBackground(URL... urls) {
+            // These two need to be declared outside the try/catch
+            // so that they can be closed in the finally block.
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
 
-        // Will contain the raw JSON response as a string.
-        String forecastJsonStr = null;
+            // Will contain the raw JSON response as a string.
+            String forecastJsonStr = null;
 
-        try {
-            // Construct the URL for the OpenWeatherMap query
-            // Possible parameters are available at OWM's forecast API page, at
-            // http://openweathermap.org/API#forecast
-            URL url = null;
             try {
-                url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+                // Construct the URL for the OpenWeatherMap query
+                // Possible parameters are available at OWM's forecast API page, at
+                // http://openweathermap.org/API#forecast
 
-            // Create the request to OpenWeatherMap, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+                URL url = urls[0];
 
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
+                // Create the request to OpenWeatherMap, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    forecastJsonStr = null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    forecastJsonStr = null;
+                }
+                forecastJsonStr = buffer.toString();
+            } catch (IOException e) {
+                Log.e("ForecastFragment", "Error ", e);
+                // If the code didn't successfully get the weather data, there's no point in attempting
+                // to parse it.
                 forecastJsonStr = null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                forecastJsonStr = null;
-            }
-            forecastJsonStr = buffer.toString();
-        } catch (IOException e) {
-            Log.e("ForecastFragment", "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attempting
-            // to parse it.
-            forecastJsonStr = null;
-        } finally{
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e("ForecastFragment", "Error closing stream", e);
+            } finally{
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e("ForecastFragment", "Error closing stream", e);
+                    }
                 }
             }
+            return forecastJsonStr;
         }
-        return forecastJsonStr;
     }
 }
