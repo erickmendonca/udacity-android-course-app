@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,15 +47,7 @@ public class ForecastFragment extends Fragment {
         };
 
         //getting live data
-        try {
-            URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
-            new FetchWeatherTask().execute(url);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        String forecastJson = null;
-        Log.i("forecastJson", forecastJson);
+        new FetchWeatherTask().execute();
 
         List<String> weekForecast = new ArrayList<String>(
                 Arrays.asList(forecastArray));
@@ -78,8 +69,8 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
-    private class FetchWeatherTask extends AsyncTask<URL, Void, String> {
-        protected String doInBackground(URL... urls) {
+    private class FetchWeatherTask extends AsyncTask<Void, Void, String> {
+        protected String doInBackground(Void... params) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -92,8 +83,7 @@ public class ForecastFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are available at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-
-                URL url = urls[0];
+                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -139,6 +129,9 @@ public class ForecastFragment extends Fragment {
                     }
                 }
             }
+
+            Log.i("forecastJsonStr", forecastJsonStr);
+
             return forecastJsonStr;
         }
     }
