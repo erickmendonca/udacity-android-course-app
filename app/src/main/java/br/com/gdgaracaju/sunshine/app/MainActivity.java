@@ -8,6 +8,9 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
