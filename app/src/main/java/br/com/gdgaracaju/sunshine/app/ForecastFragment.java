@@ -1,12 +1,14 @@
 package br.com.gdgaracaju.sunshine.app;
 
 import android.app.Fragment;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,27 +34,34 @@ public class ForecastFragment extends Fragment {
 
     private ArrayAdapter<String> mForecastAdapter;
 
+    public ForecastFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //Report that this fragment would like to participate in populating the options menu by receiving a call to onCreateOptionsMenu(Menu, MenuInflater) and related methods.
+        this.setHasOptionsMenu(true);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        //Report that this fragment would like to participate in populating the options menu by receiving a call to onCreateOptionsMenu(Menu, MenuInflater) and related methods.
-        this.setHasOptionsMenu(true);
-
         //fake data
-        String[] forecastArray ={
-            "Today - Sunny - 88/63",
-            "Tomorrow - Sunny - 88/63",
-            "Tuesday - Sunny - 88/63",
-            "Wednesday - Sunny - 88/63",
-            "Thursday - Sunny - 88/63",
-            "Friday - Sunny - 88/63",
-            "Sunday - Sunny - 88/63"
+        String[] forecastArray = {
+                "Today - Sunny - 88/63",
+                "Tomorrow - Sunny - 88/63",
+                "Tuesday - Sunny - 88/63",
+                "Wednesday - Sunny - 88/63",
+                "Thursday - Sunny - 88/63",
+                "Friday - Sunny - 88/63",
+                "Sunday - Sunny - 88/63"
         };
 
         //getting live data
-        new FetchWeatherTask().execute();
+        fetchWeather();
 
         List<String> weekForecast = new ArrayList<String>(
                 Arrays.asList(forecastArray));
@@ -73,23 +83,63 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
+    @Override
     //Initialize the contents of the Activity's standard options menu. You should place your menu items in to menu.
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            fetchWeather();
+            Log.v(LOG_TAG, "Menu id " + Integer.toString(id));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-    private class FetchWeatherTask extends AsyncTask<Void, Void, Void> {
+    private void fetchWeather(){
+        //getting live data
+        new FetchWeatherTask().execute("49095780");
+    }
+
+
+    private class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
-        // Construct the URL for the OpenWeatherMap query
-        // Possible parameters are available at OWM's forecast API page, at
-        // http://openweathermap.org/API#forecast
-        private static final String URL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7";
+        private URL buildURL(String postalcode) throws MalformedURLException {
+            // Construct the URL for the OpenWeatherMap query
+            // Possible parameters are available at OWM's forecast API page, at
+            // http://openweathermap.org/API#forecast
+            //http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("http")
+                    .authority("api.openweathermap.org")
+                    .appendPath("data")
+                    .appendPath("2.5")
+                    .appendPath("forecast")
+                    .appendPath("daily")
+                    .appendQueryParameter("q", postalcode)
+                    .appendQueryParameter("mode", "json")
+                    .appendQueryParameter("units", "metric")
+                    .appendQueryParameter("cnt", "7");
+            String builtUri = builder.build().toString();
+            Log.v(LOG_TAG,builtUri);
+            return new URL(builtUri);
+        }
 
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(String... params) {
+            if (params.length == 0)
+                return null;
+
+            String postalcode = params[0];
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -99,8 +149,10 @@ public class ForecastFragment extends Fragment {
             // Will contain the raw JSON response as a string.
             String forecastJsonStr = null;
 
+
             try {
-                URL url = new URL(URL);
+
+                URL url = buildURL(postalcode);
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -148,7 +200,7 @@ public class ForecastFragment extends Fragment {
             }
 
             if (forecastJsonStr != null)
-                Log.i(LOG_TAG, forecastJsonStr);
+                Log.v(LOG_TAG, forecastJsonStr);
 
             return null;
         }
