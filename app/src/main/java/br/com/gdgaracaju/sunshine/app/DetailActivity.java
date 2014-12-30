@@ -49,7 +49,7 @@ public class DetailActivity extends Activity {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A generic_placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
 

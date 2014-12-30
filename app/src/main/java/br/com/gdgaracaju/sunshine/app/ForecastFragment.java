@@ -32,7 +32,7 @@ import java.util.List;
 import br.com.gdgaracaju.sunshine.app.util.WeatherDataParser;
 
 /**
- * A placeholder fragment containing a simple view.
+ * A generic_placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
 
