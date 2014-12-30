@@ -40,6 +40,8 @@ public class ForecastFragment extends Fragment {
 
     public ArrayAdapter<String> mForecastAdapter;
 
+    String forecastJsonStr = null;
+
     public ForecastFragment() {
     }
 
@@ -83,7 +85,9 @@ public class ForecastFragment extends Fragment {
                 //        Toast.LENGTH_SHORT).show();
                 // Executed in an Activity, so 'this' is the Context
                 Intent detailIntent = new Intent(getActivity(), DetailActivity.class)
-                    .putExtra(Intent.EXTRA_TEXT, forecast);
+                    .putExtra(Intent.EXTRA_TEXT, forecast)
+                    .putExtra("forecastJson", forecastJsonStr)
+                    .putExtra("dayNumber",position);
                 getActivity().startActivity(detailIntent);
             }
         });
@@ -158,7 +162,7 @@ public class ForecastFragment extends Fragment {
             BufferedReader reader = null;
 
             // Will contain the raw JSON response as a string.
-            String forecastJsonStr = null;
+            forecastJsonStr = null;
             String[] forecast = null;
 
 
@@ -173,7 +177,7 @@ public class ForecastFragment extends Fragment {
 
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 if (inputStream == null) {
                     // Nothing to do.
                     return null;
@@ -185,7 +189,7 @@ public class ForecastFragment extends Fragment {
                     // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                     // But it does make debugging a *lot* easier if you print out the completed
                     // buffer for debugging.
-                    buffer.append(line + "\n");
+                    buffer.append(line).append("\n");
                 }
 
                 if (buffer.length() == 0) {

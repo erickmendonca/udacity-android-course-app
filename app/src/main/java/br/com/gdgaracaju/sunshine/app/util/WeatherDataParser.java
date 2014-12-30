@@ -48,6 +48,52 @@ public class WeatherDataParser {
         return highLowStr;
     }
 
+    public static WeatherDetail[] getWeatherDetailFromJson(String forecastJsonStr, int numDays) throws JSONException {
+        // These are the names of the JSON objects that need to be extracted.
+        final String OWM_LIST = "list";
+        final String OWM_WEATHER = "weather";
+        final String OWM_TEMPERATURE = "temp";
+        final String OWM_MAX = "max";
+        final String OWM_MIN = "min";
+        final String OWM_DATETIME = "dt";
+        final String OWM_DESCRIPTION = "main";
+
+        JSONObject forecastJson = new JSONObject(forecastJsonStr);
+        JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
+
+        WeatherDetail[] result = new WeatherDetail[numDays];
+        for(int i = 0; i < weatherArray.length(); i++) {
+            // For now, using the format "Day, description, hi/low"
+            String day;
+            String description;
+
+            // Get the JSON object representing the day
+            JSONObject dayForecast = weatherArray.getJSONObject(i);
+
+            long dateTime = dayForecast.getLong(OWM_DATETIME);
+
+            // description is in a child array called "weather", which is 1 element long.
+            JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
+            description = weatherObject.getString(OWM_DESCRIPTION);
+
+            // Temperatures are in a child object called "temp".  Try not to name variables
+            // "temp" when working with temperature.  It confuses everybody.
+            JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
+            double high = temperatureObject.getDouble(OWM_MAX);
+            double low = temperatureObject.getDouble(OWM_MIN);
+
+            WeatherDetail weather = new WeatherDetail();
+            weather.date = new Date(dateTime);
+            weather.weatherCondition = description;
+            weather.maxTemperature = high;
+            weather.minTemperature = low;
+
+            result[i] = weather;
+        }
+
+        return result;
+    }
+
     /**
      * Take the String representing the complete forecast in JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
@@ -102,4 +148,5 @@ public class WeatherDataParser {
 
         return resultStrs;
     }
+
 }

@@ -11,6 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
+import java.text.SimpleDateFormat;
+
+import br.com.gdgaracaju.sunshine.app.util.WeatherDataParser;
+import br.com.gdgaracaju.sunshine.app.util.WeatherDetail;
+
 
 public class DetailActivity extends Activity {
 
@@ -61,9 +68,38 @@ public class DetailActivity extends Activity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-            TextView detailText = (TextView)rootView.findViewById(R.id.text_detail);
-            String forecast = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
-            detailText.setText(forecast);
+            //collecting data
+            Intent intent = getActivity().getIntent();
+            //forecast TODO: remove
+            String forecast = intent.getStringExtra(Intent.EXTRA_TEXT);
+            String forecastJson = intent.getStringExtra("forecastJson");
+            int dayNumber = intent.getIntExtra("dayNumber", 0);
+
+            TextView dayText = (TextView)rootView.findViewById(R.id.day_detail);
+            TextView dateText = (TextView)rootView.findViewById(R.id.date_detail);
+            TextView maxTempText = (TextView)rootView.findViewById(R.id.max_temp_detail);
+            TextView minTempText = (TextView)rootView.findViewById(R.id.min_temp_detail);
+            TextView weatherText = (TextView)rootView.findViewById(R.id.weather_description_detail);
+
+
+            try {
+                WeatherDetail[] weatherDetails = WeatherDataParser.getWeatherDetailFromJson(forecastJson, 7);
+                WeatherDetail weather = weatherDetails[dayNumber];
+
+                SimpleDateFormat format = new SimpleDateFormat("MMMM d");
+                dateText.setText(format.format(weather.date).toString());
+
+                format = new SimpleDateFormat("EEEE");
+                dayText.setText(format.format(weather.date).toString());
+
+                maxTempText.setText(Long.toString(Math.round(weather.maxTemperature))+"º");
+                minTempText.setText(Long.toString(Math.round(weather.minTemperature))+"º");
+                weatherText.setText(weather.weatherCondition);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
 
             return rootView;
         }
