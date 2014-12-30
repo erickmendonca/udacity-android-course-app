@@ -2,12 +2,14 @@ package br.com.gdgaracaju.sunshine.app;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 
 public class DetailActivity extends Activity {
@@ -58,6 +60,11 @@ public class DetailActivity extends Activity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+            TextView detailText = (TextView)rootView.findViewById(R.id.text_detail);
+            String forecast = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
+            detailText.setText(forecast);
+
             return rootView;
         }
     }
