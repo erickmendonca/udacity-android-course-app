@@ -94,9 +94,6 @@ public class ForecastFragment extends Fragment {
             }
         });
 
-        //getting live data
-        fetchWeather();
-
         return rootView;
     }
 
@@ -114,7 +111,7 @@ public class ForecastFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            fetchWeather();
+            updateWeather();
             //Log.v(LOG_TAG, "Menu id " + Integer.toString(id));
             return true;
         }
@@ -122,10 +119,18 @@ public class ForecastFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void fetchWeather(){
+    @Override
+    public void onStart() {
+        super.onStart();
+        //getting live data
+        updateWeather();
+    }
+
+    private void updateWeather(){
         //getting live data
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String location = sharedPref.getString(this.getString(R.string.pref_location_key), "");
+        String location = sharedPref.getString(this.getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
         Log.v(LOG_TAG, location);
         new FetchWeatherTask().execute(location);
     }
