@@ -116,6 +116,7 @@ public class ForecastFragment extends Fragment {
             //Log.v(LOG_TAG, "Menu id " + Integer.toString(id));
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
