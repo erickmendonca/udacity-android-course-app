@@ -29,7 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import br.com.gdgaracaju.sunshine.app.util.WeatherDataParser;
 
@@ -60,8 +59,6 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
 
-        List<String> weekForecast = new ArrayList<String>();
-
         this.mForecastAdapter = new ArrayAdapter<String>(
                 //context
                 getActivity(),
@@ -69,8 +66,8 @@ public class ForecastFragment extends Fragment {
                 R.layout.list_item_forecast,
                 //id of textview to populate
                 R.id.list_item_forecast_textview,
-                //data
-                weekForecast);
+                //data -- filled on updateWeather()
+                new ArrayList<String>());
 
 
         ListView listView = (ListView) rootView.findViewById(

@@ -3,5 +3,9 @@
 
     <string name="action_settings">Configurações</string>
     <string name="action_refresh">Atualizar</string>
+    <string name="pref_location_label">Localização</string>
+    <string name="title_activity_detail">Detalhe</string>
+    <string name="title_activity_settings">Configurações</string>
+    <string name="pref_unit_label">Unidade</string>
 
 </resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array
+        name="unit_settings_entries">
+        <item>Imperial</item>
+        <item>Métrico</item>
+    </string-array>
+
+</resources>
