@@ -33,7 +33,7 @@ public class WeatherDataParser {
         // it must be converted to milliseconds in order to be converted to valid date.
         Date date = new Date(time * 1000);
         SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
-        return format.format(date).toString();
+        return format.format(date);
     }
 
     /**
@@ -44,8 +44,7 @@ public class WeatherDataParser {
         long roundedHigh = Math.round(high);
         long roundedLow = Math.round(low);
 
-        String highLowStr = roundedHigh + "/" + roundedLow;
-        return highLowStr;
+        return roundedHigh + "/" + roundedLow;
     }
 
     public static WeatherDetail[] getWeatherDetailFromJson(String forecastJsonStr, int numDays) throws JSONException {
@@ -87,6 +86,7 @@ public class WeatherDataParser {
             weather.weatherCondition = description;
             weather.maxTemperature = high;
             weather.minTemperature = low;
+            weather.temperatureUnit = TemperatureUnit.CELSIUS;
 
             result[i] = weather;
         }
@@ -101,7 +101,7 @@ public class WeatherDataParser {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    public static String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    public static String[] getWeatherDataFromJson(String forecastJsonStr, int numDays, TemperatureUnit unit)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
@@ -142,6 +142,11 @@ public class WeatherDataParser {
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
 
+            if (unit.equals(TemperatureUnit.FARENHEIT)){
+                high = convertCelsiusToFarenheit(high);
+                low = convertCelsiusToFarenheit(low);
+            }
+
             highAndLow = formatHighLows(high, low);
             resultStrs[i] = day + " - " + description + " - " + highAndLow;
         }
@@ -149,4 +154,11 @@ public class WeatherDataParser {
         return resultStrs;
     }
 
+    public static double convertCelsiusToFarenheit(double celsius){
+        return (celsius * 9/5.0) +32;
+    }
+
+    public static double convertFarenheitToCelsius(double farenheit){
+        return (farenheit - 32) * 5/9.0;
+    }
 }

@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import br.com.gdgaracaju.sunshine.app.util.TemperatureUnit;
 import br.com.gdgaracaju.sunshine.app.util.WeatherDataParser;
 
 /**
@@ -226,7 +227,16 @@ public class ForecastFragment extends Fragment {
             if (forecastJsonStr != null) {
                 //Log.v(LOG_TAG, forecastJsonStr);
                 try {
-                    forecast = WeatherDataParser.getWeatherDataFromJson(forecastJsonStr, 7);
+
+                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    String prefUnit = sharedPref.getString(getActivity().getString(R.string.pref_unit_key),
+                            getString(R.string.pref_unit_default));
+                    String[] units = getActivity().getResources().getStringArray(R.array.unit_settings_values);
+
+                    if (prefUnit.equals(units[0]))
+                        forecast = WeatherDataParser.getWeatherDataFromJson(forecastJsonStr, 7, TemperatureUnit.FARENHEIT);
+                    else
+                        forecast = WeatherDataParser.getWeatherDataFromJson(forecastJsonStr, 7, TemperatureUnit.CELSIUS);
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "Malformed JSON", e);
                 }
