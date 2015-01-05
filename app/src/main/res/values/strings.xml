@@ -14,5 +14,8 @@
     <string name="pref_unit_label">Unit</string>
     <string name="pref_unit_key" translatable="false">unit</string>
     <string name="pref_unit_default" translatable="false">metric</string>
+    <string name="action_show_map">Show on map</string>
+    <string name="error_geocode_zip">Unable to geocode zipcode</string>
+    <string name="error_geolocation">Error getting geolocation</string>
 
 </resources>
