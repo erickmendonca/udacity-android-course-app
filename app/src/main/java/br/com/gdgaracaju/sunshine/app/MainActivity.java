@@ -87,7 +87,12 @@ public class MainActivity extends Activity {
 
     private void showMap(Address address) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(address.getUrl()));
+        double lat = address.getLatitude();
+        double lon = address.getLongitude();
+        StringBuilder geoBuilder = new StringBuilder("geo:");
+        String geo = geoBuilder.append(Double.toString(lat)).append(",").append(Double.toString(lon)).toString();
+
+        intent.setData(Uri.parse(geo));
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }
