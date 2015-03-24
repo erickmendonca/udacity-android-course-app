@@ -42,7 +42,7 @@ public class ForecastFragment extends Fragment {
 
     public ArrayAdapter<String> mForecastAdapter;
 
-    String forecastJsonStr = null;
+    String forecastJsonStr = "";
 
     public ForecastFragment() {
     }
@@ -59,6 +59,8 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        ArrayList<String> dummyData = new ArrayList<String>();
+        dummyData.add("dummy data :)");
 
         this.mForecastAdapter = new ArrayAdapter<String>(
                 //context
@@ -68,7 +70,7 @@ public class ForecastFragment extends Fragment {
                 //id of textview to populate
                 R.id.list_item_forecast_textview,
                 //data -- filled on updateWeather()
-                new ArrayList<String>());
+                dummyData);
 
 
         ListView listView = (ListView) rootView.findViewById(
